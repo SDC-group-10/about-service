@@ -1,37 +1,46 @@
-const connection = require('./connection.js');
+const { Pool } = require('pg');
+
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'rental_hosts',
+  password: 'asdf1234',
+});
+
+pool.connect();
 
 const selectHostInfo = (id, callback) => {
-  const theQuery = `select * from hosts where id = ${id}`;
-  connection.query(theQuery, (err, result) => {
+  const theQuery = 'select * from hosts where id = $1';
+  pool.query(theQuery, [id], (err, res) => {
     if (err) {
-      callback(err);
-    } else {
-      callback(null, result);
+      throw err;
     }
+    // console.log('HOSTINFO', res.rows[0]);
+    callback(null, res.rows[0]);
   });
 };
 
 const reviewsForHost = (id, callback) => {
-  const theQuery = `select * from reviews where user_id = ${id}`;
-  connection.query(theQuery, (err, result) => {
+  const theQuery = 'select * from reviews where user_id = $1';
+  pool.query(theQuery, [id], (err, res) => {
     if (err) {
-      callback(err);
-    } else {
-      callback(null, result.length);
+      throw err;
     }
+    // console.log('REVIEWSFORHOST', res.rows[0]);
+    callback(null, res.rows.length);
   });
 };
 
 const neighborhoodInfo = (id, callback) => {
-  const theQuery = `select * from listings where id = ${id}`;
-  connection.query(theQuery, (err, result)=> {
+  const theQuery = 'select * from listings where id = $1';
+  pool.query(theQuery, [id], (err, res) => {
     if (err) {
-      console.log(err);
-    } else {
-      callback(null, result);
+      throw err;
     }
-  })
-}
+    // console.log('NEIGHBORHOOD', res.rows[0]);
+    callback(null, res.rows[0]);
+  });
+};
 
 module.exports = {
   selectHostInfo, reviewsForHost, neighborhoodInfo,
