@@ -3,9 +3,9 @@ const mockData = require('./mockdata.js');
 
 
 const connection = mysql.createConnection({
-  host: 'database',
+  host: 'local',
   user: 'root',
-  password: 'dog',
+  password: '',
   database: 'rental_hosts',
   port: '3306',
 });
@@ -95,4 +95,4 @@ listingDataGenerator();
 hostsDataGenerator();
 reviewsDataGenerator(100, 100);
 }, 3000);
-module.exports = connection;
+// module.exports = connection;
