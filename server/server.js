@@ -1,52 +1,73 @@
 require('newrelic');
+const cluster = require('cluster');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 // need to create a file to select data
 const db = require('../db/queries.js');
 
-const app = express();
-
-// to parse our data and use req.body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static(path.join(__dirname, '../public')));
-
-app.get('/api/about/hosts/:id', (req, res) => {
-  // console.log(req.params);
-  db.selectHostInfo(+req.params.id, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      console.log('SELECT HOST INFO:', result)
-      res.send(JSON.stringify(result));
-    }
+if (cluster.isMaster) {
+  const cpuCount = require('os').cpus().length;
+  for (let i = 0; i < cpuCount; i += 1) {
+    cluster.fork();
+  }
+  cluster.on('exit', (worker) => {
+    cluster.fork();
   });
-});
+} else {
+  const app = express();
 
-app.get('/api/about/reviews/:listingId', (req, res) => {
-  db.reviewsForHost(+req.params.listingId, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send(JSON.stringify(result));
-    }
+  // to parse our data and use req.body
+  app.use(bodyParser.json());
+  app.use(bodyParser.urlencoded({ extended: false }));
+  app.use(express.static(path.join(__dirname, '../public')));
+
+  app.get('/api/about/hosts/:id', (req, res) => {
+    // console.log(req.params);
+    db.selectHostInfo(+req.params.id, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(JSON.stringify(result));
+      }
+    });
   });
-});
 
-app.get('/api/about/neighborhood/:listingId', (req, res) => {
-  db.neighborhoodInfo(+req.params.listingId, (err, result) => {
-    if (err) {
-      console.log(err);
-    } else {
-      res.send(JSON.stringify(result));
-    }
+  app.get('/api/about/reviews/:listingId', (req, res) => {
+    db.reviewsForHost(+req.params.listingId, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(JSON.stringify(result));
+      }
+    });
   });
-});
 
-app.listen(3001, () => {
-  console.log('Server started on 3001');
-});
+  app.get('/api/about/neighborhood/:listingId', (req, res) => {
+    db.neighborhoodInfo(+req.params.listingId, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(JSON.stringify(result));
+      }
+    });
+  });
+
+  app.post('/api/about/post', (req, res) => {
+    const data = req.body.name;
+    db.postList(data, (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.send(result);
+      }
+    });
+  });
+
+  app.listen(3001, () => {
+    console.log('Server started on 3001');
+  });
+}
 
 
 // const express = require('express');

@@ -42,8 +42,18 @@ const neighborhoodInfo = (id, callback) => {
   });
 };
 
+const postList = (name, callback) => {
+  const theQuery = 'insert into listings(name) values($1)';
+  pool.query(theQuery, [name], (err, res) => {
+    if (err) {
+      throw err;
+    }
+    callback(null, res.rows[0]);
+  });
+}
+
 module.exports = {
-  selectHostInfo, reviewsForHost, neighborhoodInfo,
+  selectHostInfo, reviewsForHost, neighborhoodInfo, postList
 };
 
 // selectHostInfo();
