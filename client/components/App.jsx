@@ -38,7 +38,8 @@ class App extends React.Component {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     $.get(`/api/about/hosts/${this.state.id}`, (data) => {
-      this.setState({ host: JSON.parse(data)[0] });
+      console.log('APP.JS DATA:', data);
+      this.setState({ host: JSON.parse(data) });
       this.setState({ joinMonth: monthNames[Number(this.state.host.joined_in_date.split('-')[1]) - 1] });
       this.setState({ joinYear: this.state.host.joined_in_date.split('-')[0] });
     });
@@ -52,11 +53,8 @@ class App extends React.Component {
 
   getNeighborhoodInfo() {
     $.get(`/api/about/neighborhood/${this.state.listingId}`, (data) => {
-      let neighborhoodInfo = JSON.parse(data);
-      let lon_location = neighborhoodInfo[0].lon_location;
-      let lat_location = neighborhoodInfo[0].lat_location;
-      // let location = {lon_location, lat_location};
-      this.setState({ neighborhoodInfo: neighborhoodInfo[0] });
+      let info = JSON.parse(data);
+      this.setState({ neighborhoodInfo: info });
     });
   }
 

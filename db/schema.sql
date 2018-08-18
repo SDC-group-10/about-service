@@ -24,6 +24,7 @@ CREATE TABLE hosts (
 
 CREATE TABLE listings (
   id INT NOT NULL AUTO_INCREMENT,
+  name varchar(500),
   features varchar(500),
   things_to_do varchar(500),
   lat_location float,
