@@ -15,7 +15,6 @@ const selectHostInfo = (id, callback) => {
     if (err) {
       throw err;
     }
-    // console.log('HOSTINFO', res.rows[0]);
     callback(null, res.rows[0]);
   });
 };
@@ -26,7 +25,6 @@ const reviewsForHost = (id, callback) => {
     if (err) {
       throw err;
     }
-    // console.log('REVIEWSFORHOST', res.rows[0]);
     callback(null, res.rows.length);
   });
 };
@@ -37,7 +35,6 @@ const neighborhoodInfo = (id, callback) => {
     if (err) {
       throw err;
     }
-    // console.log('NEIGHBORHOOD', res.rows[0]);
     callback(null, res.rows[0]);
   });
 };
@@ -50,7 +47,7 @@ const postList = (name, callback) => {
     }
     callback(null, res.rows[0]);
   });
-}
+};
 
 module.exports = {
   selectHostInfo, reviewsForHost, neighborhoodInfo, postList

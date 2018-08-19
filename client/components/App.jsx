@@ -39,7 +39,7 @@ class App extends React.Component {
 
     $.get(`/api/about/hosts/${this.state.id}`, (data) => {
       console.log('APP.JS DATA:', data);
-      this.setState({ host: JSON.parse(data) });
+      this.setState({ host: data });
       this.setState({ joinMonth: monthNames[Number(this.state.host.joined_in_date.split('-')[1]) - 1] });
       this.setState({ joinYear: this.state.host.joined_in_date.split('-')[0] });
     });
