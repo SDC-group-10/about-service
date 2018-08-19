@@ -10,7 +10,7 @@ for (let i = 10000000; i < 12000000; i += 50) {
   var post = go.post('/api/about/post', { name: 'stresstest' }).for(1).times
 }
 
-hosts.attack();
-reviews.attack();
-hood.attack();
-post.attack();
+hosts.concurrent(100).attack();
+reviews.concurrent(100).attack();
+hood.concurrent(100).attack();
+post.concurrent(100).attack();
