@@ -3,6 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const redis = require('redis');
+const compression = require('compression');
 // need to create a file to select data
 const db = require('../db/queries.js');
 
@@ -10,12 +11,14 @@ const app = express();
 const client = redis.createClient();
 
 // to parse our data and use req.body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/api/about/hosts/:id', (req, res) => {
-  client.get(+req.params.id, (err1, result1) => {
+  client.get(`HOST${req.params.id}`, (err1, result1) => {
     if (result1) {
       res.send(result1);
     } else {
@@ -23,7 +26,7 @@ app.get('/api/about/hosts/:id', (req, res) => {
         if (err) {
           console.log(err);
         } else {
-          client.setex(+req.params.id, 6379, JSON.stringify(result));
+          client.setex(`HOST${req.params.id}`, 3600, JSON.stringify(result));
           res.send(JSON.stringify(result));
         }
       });
@@ -32,7 +35,7 @@ app.get('/api/about/hosts/:id', (req, res) => {
 });
 
 app.get('/api/about/reviews/:listingId', (req, res) => {
-  client.get(+req.params.id, (err1, result1) => {
+  client.get(`REV${req.params.id}`, (err1, result1) => {
     if (result1) {
       res.send(result1);
     } else {
@@ -40,7 +43,7 @@ app.get('/api/about/reviews/:listingId', (req, res) => {
         if (err) {
           console.log(err);
         } else {
-          client.setex(+req.params.id, 6379, JSON.stringify(result));
+          client.setex(`REV${req.params.id}`, 3600, JSON.stringify(result));
           res.send(JSON.stringify(result));
         }
       });
@@ -49,7 +52,7 @@ app.get('/api/about/reviews/:listingId', (req, res) => {
 });
 
 app.get('/api/about/neighborhood/:listingId', (req, res) => {
-  client.get(+req.params.id, (err1, result1) => {
+  client.get(`INFO${req.params.id}`, (err1, result1) => {
     if (result1) {
       res.send(result1);
     } else {
@@ -57,8 +60,8 @@ app.get('/api/about/neighborhood/:listingId', (req, res) => {
         if (err) {
           console.log(err);
         } else {
-          client.setex(+req.params.id, 6379, JSON.stringify(result));
-          res.send(JSON.stringify(result));
+          client.setex(`INFO${req.params.id}`, 3600, JSON.stringify(result));
+          res.send((result));
         }
       });
     }

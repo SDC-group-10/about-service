@@ -38,7 +38,7 @@ class App extends React.Component {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
     $.get(`/api/about/hosts/${this.state.id}`, (data) => {
-      console.log('APP.JS DATA:', data);
+      data = JSON.parse(data);
       this.setState({ host: data });
       this.setState({ joinMonth: monthNames[Number(this.state.host.joined_in_date.split('-')[1]) - 1] });
       this.setState({ joinYear: this.state.host.joined_in_date.split('-')[0] });
@@ -53,8 +53,7 @@ class App extends React.Component {
 
   getNeighborhoodInfo() {
     $.get(`/api/about/neighborhood/${this.state.listingId}`, (data) => {
-      let info = JSON.parse(data);
-      this.setState({ neighborhoodInfo: info });
+      this.setState({ neighborhoodInfo: data });
     });
   }
 
@@ -85,8 +84,7 @@ class App extends React.Component {
 
         <HostDescription host={this.state.host} responseTimeConvertor={this.responseTimeConvertor} />
         <ContactAirbnb />
-        {this.state.neighborhoodInfo && <Neighborhood neighborhoodInfo={this.state.neighborhoodInfo} lat={this.state.neighborhoodInfo.lat_location } lng={this.state.neighborhoodInfo.lon_location} zoom='11' /> }
-
+        {this.state.neighborhoodInfo && <Neighborhood neighborhoodInfo={this.state.neighborhoodInfo} lat={this.state.neighborhoodInfo.lat_location} lng={this.state.neighborhoodInfo.lon_location} zoom='11' /> }
 
 
       </div>
