@@ -1,44 +1,80 @@
+require('newrelic');
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const redis = require('redis');
+const compression = require('compression');
 // need to create a file to select data
 const db = require('../db/queries.js');
 
 const app = express();
+const client = redis.createClient();
 
 // to parse our data and use req.body
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(compression());
+// app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 app.get('/api/about/hosts/:id', (req, res) => {
-  // console.log(req.params);
-  db.selectHostInfo(+req.params.id, (err, result) => {
-    if (err) {
-      console.log(err);
+  client.get(`HOST${req.params.id}`, (err1, result1) => {
+    if (result1) {
+      res.send(result1);
     } else {
-      console.log('SELECT HOST INFO:', result)
-      res.send(JSON.stringify(result));
+      db.selectHostInfo(+req.params.id, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          client.setex(`HOST${req.params.id}`, 3600, JSON.stringify(result));
+          res.send(JSON.stringify(result));
+        }
+      });
     }
   });
 });
 
 app.get('/api/about/reviews/:listingId', (req, res) => {
-  db.reviewsForHost(+req.params.listingId, (err, result) => {
-    if (err) {
-      console.log(err);
+  client.get(`REV${req.params.id}`, (err1, result1) => {
+    if (result1) {
+      res.send(result1);
     } else {
-      res.send(JSON.stringify(result));
+      db.reviewsForHost(+req.params.listingId, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          client.setex(`REV${req.params.id}`, 3600, JSON.stringify(result));
+          res.send(JSON.stringify(result));
+        }
+      });
     }
   });
 });
 
 app.get('/api/about/neighborhood/:listingId', (req, res) => {
-  db.neighborhoodInfo(+req.params.listingId, (err, result) => {
+  client.get(`INFO${req.params.id}`, (err1, result1) => {
+    if (result1) {
+      res.send(result1);
+    } else {
+      db.neighborhoodInfo(+req.params.listingId, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          client.setex(`INFO${req.params.id}`, 3600, JSON.stringify(result));
+          res.send((result));
+        }
+      });
+    }
+  });
+});
+
+app.post('/api/about/post', (req, res) => {
+  const data = req.body.name;
+  db.postList(data, (err, result) => {
     if (err) {
       console.log(err);
     } else {
-      res.send(JSON.stringify(result));
+      res.send(result);
     }
   });
 });
