@@ -4,11 +4,14 @@ services:
   about-service:
     build: ./
     depends_on:
-      - 'database'
+      - 'redis'
     ports:
       - '3001:3001'
-    restart: on-failure
-    # command: bash -c "sleep 10; node ./server.js"
+    # restart: on-failure
+    links:
+      - redis
+    environment:
+      - REDIS_URL=redis://cache
 
  # db:
  #   build: db/
@@ -20,12 +23,8 @@ services:
  #   ports:
  #     - '3306:3306'
 
-  database:
-    build: ./db/
-    image: mysql/mysql-server/5.7
-    environment:
-      - MYSQL_ROOT_PASSWORD=dog
-      - MYSQL_DATABASE=rental_hosts
-      - MYSQL_USER=root
+  redis:
+    image: redis:3.2
+    container_name: cache
     ports:
-      - 3306:3306
+      - 6397:6397

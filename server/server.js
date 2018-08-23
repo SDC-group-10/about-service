@@ -8,7 +8,8 @@ const compression = require('compression');
 const db = require('../db/queries.js');
 
 const app = express();
-const client = redis.createClient();
+const client = redis.createClient(process.env.REDIS_URL);
+
 
 // to parse our data and use req.body
 app.use(compression());
